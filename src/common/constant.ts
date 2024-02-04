@@ -47,7 +47,7 @@ export let numFmtDefault:IattributeList = {
     "11": '0.00E+00',
     "12": '# ?/?',
     "13": '# ??/??',
-    "14": 'm/d/yy',
+    "14": 'yyyy/m/d',
     "15": 'd-mmm-yy',
     "16": 'd-mmm',
     "17": 'mmm-yy',
@@ -55,7 +55,7 @@ export let numFmtDefault:IattributeList = {
     "19": 'h:mm:ss AM/PM',
     "20": 'h:mm',
     "21": 'h:mm:ss',
-    "22": 'm/d/yy h:mm',
+    "22": 'm/d/yy h:mm',    
     "37": '#,##0 ;(#,##0)',
     "38": '#,##0 ;[Red](#,##0)',
     "39": '#,##0.00;(#,##0.00)',
@@ -64,7 +64,16 @@ export let numFmtDefault:IattributeList = {
     "46": '[h]:mm:ss',
     "47": 'mmss.0',
     "48": '##0.0E+0',
-    "49": '@'
+    "49": '@',
+    //补充excel自定义格式
+    '30':'m/d/yy',
+    '31':'yyyy&quot;年&quot;m&quot;月&quot;d&quot;日&quot;', 
+    '32':'h&quot;时&quot;mm&quot;分&quot;',   
+    '33':'h&quot;时&quot;mm&quot;分&quot;ss&quot;秒&quot;',
+    '55':'上午/下午h&quot;时&quot;mm&quot;分&quot;',
+    '56':'上午/下午h&quot;时&quot;mm&quot;分&quot;ss&quot;秒&quot;',
+    '57':'yyyy&quot;年&quot;m&quot;月&quot;',    
+    '58':'m&quot;月&quot;d&quot;日&quot;'
 }
 
 export const indexedColors:IattributeList = {
