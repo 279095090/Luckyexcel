@@ -41,7 +41,8 @@ const pkg = require('./package.json');
 
 
 const paths = {
-    pages: ['src/*.html',"assets/**"]
+    pages: ['src/*.html', "assets/**"],
+    demos: ['demo/*']
 };
 
 // babel config
@@ -64,9 +65,15 @@ const paths = {
 // };
 
 // Copy html
-function copyHtml(){
+function copyHtml() {
     return src(paths.pages)
         .pipe(dest("dist"));
+}
+
+// Copy demo
+function copyDemo() {
+    return src(paths.demos)
+        .pipe(dest("dist/demo"));
 }
 
 // Refresh browser
@@ -79,7 +86,7 @@ function reloadBrowser(done) {
 // Monitoring static file changes
 function watcher(done) {
     // watch static
-    watch(paths.pages,{ delay: 500 }, series(copyHtml, reloadBrowser));
+    watch(paths.pages, { delay: 500 }, series(copyHtml, reloadBrowser));
     done();
 }
 
@@ -92,20 +99,20 @@ const watchedBrowserify = watchify(browserify({
     ],
     cache: {},
     packageCache: {},
-    standalone:'LuckyExcel'
+    standalone: 'LuckyExcel'
 }).plugin(tsify));
 
 // 开发模式，打包成es5，方便在浏览器里直接引用调试
 function bundle() {
     return watchedBrowserify
         .transform('babelify', {
-            presets: ['@babel/preset-env','@babel/preset-typescript'],
+            presets: ['@babel/preset-env', '@babel/preset-typescript'],
             extensions: ['.ts']
         })
         .bundle()
         .pipe(source('luckyexcel.umd.js'))
         .pipe(buffer())
-        .pipe(sourcemaps.init({loadMaps: true}))
+        .pipe(sourcemaps.init({ loadMaps: true }))
         // .pipe(uglify()) //Development environment does not need to compress code
         .pipe(sourcemaps.write('./'))
         .pipe(dest("dist"));
@@ -113,15 +120,15 @@ function bundle() {
 
 // 生产模式，打包成ES模块和Commonjs模块
 async function compile() {
-    
+
     const bundle = await rollup({
         input: 'src/main.esm.ts',
         plugins: [
             // nodeResolve(), // tells Rollup how to find date-fns in node_modules
             // commonjs(), // converts date-fns to ES modules
             typescript({
-                tsconfigOverride: { 
-                    compilerOptions : { module: "ESNext" } 
+                tsconfigOverride: {
+                    compilerOptions: { module: "ESNext" }
                 }
             }),
             // terser(), // minify, but only in production
@@ -133,14 +140,14 @@ async function compile() {
         file: pkg.module,
         format: 'esm',
         name: 'LuckyExcel',
-        inlineDynamicImports:true,
+        inlineDynamicImports: true,
         // sourcemap: true
     })
     bundle.write({
         file: pkg.main,
         format: 'cjs',
         name: 'LuckyExcel',
-        inlineDynamicImports:true,
+        inlineDynamicImports: true,
         // sourcemap: true
     })
     // bundle.write({
@@ -159,23 +166,23 @@ function bundleUMD() {
         entries: ['src/main.umd.ts'],
         cache: {},
         packageCache: {},
-        standalone:'LuckyExcel'
+        standalone: 'LuckyExcel'
     })
-    .plugin(tsify)
-    .transform('babelify', {
-        presets: ['@babel/preset-env','@babel/preset-typescript'],
-        extensions: ['.ts']
-    })
-    .bundle()
-    .pipe(source('luckyexcel.umd.js'))
-    .pipe(buffer())
-    // .pipe(sourcemaps.init({loadMaps: true})) //The production environment does not need source map file
-    // .pipe(uglify())
-    .pipe(sourcemaps.write('./'))
-    .pipe(dest("dist"));
-    
+        .plugin(tsify)
+        .transform('babelify', {
+            presets: ['@babel/preset-env', '@babel/preset-typescript'],
+            extensions: ['.ts']
+        })
+        .bundle()
+        .pipe(source('luckyexcel.umd.js'))
+        .pipe(buffer())
+        // .pipe(sourcemaps.init({loadMaps: true})) //The production environment does not need source map file
+        // .pipe(uglify())
+        .pipe(sourcemaps.write('./'))
+        .pipe(dest("dist"));
+
 }
-  
+
 
 // 清除dist目录
 function clean() {
@@ -192,7 +199,7 @@ function serve() {
 }
 
 // 顺序执行
-const dev = series(clean, copyHtml, bundle, watcher, serve);
+const dev = series(clean, copyHtml, copyDemo, bundle, watcher, serve);
 
 const build = series(clean, parallel(copyHtml, compile, bundleUMD));
 
